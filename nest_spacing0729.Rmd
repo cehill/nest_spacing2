@@ -1,0 +1,241 @@
+---
+title: "nest_spacing"
+author: "Chris Hill"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Read in data into a file called "data" and show its structure
+- before you can execute this you have to save the nest card data as a csv and name it "nest_card_dataYYYYMMDD.csv" The filename has to match what's in the code below.
+- Then put the csv file in Users/chill/github/nest_spacing/ (or your own appropriate directory if you're not me)
+- since nest card data is a big sprawling data file the resulting object in r is kind of a mess, see below.
+
+```{r read}
+<<<<<<< HEAD
+data<-read.csv("nest_card_data20220731.csv")
+=======
+data<-read.csv("nest_card_data20220729.csv")
+>>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
+str(data)
+```
+
+## Rename columns
+- just renaming NEST_TERRITORY because it's annoyingly long.
+```{r}
+library(dplyr)
+data <- dplyr::rename(data, TERRITORY = NESTING_TERRITORY)
+```
+
+## Going to change "HD_YEAR" from character to integer so I can filter better.
+- commented out for troubleshooting
+
+<<<<<<< HEAD
+```{r}
+#as.integer(data$HD_YEAR)
+```
+
+=======
+>>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
+## Filter data into "data2"
+- keep only the valid nests and put them in "data2"
+- confirm that only nests with "TRUE" are left (*yes, it worked*)
+- I could also subset to just certain years at this point (keep 2019-2021)
+```{r}
+  data2<-subset(data, VALID_NEST==TRUE) #remove all but type 2 visits
+  data2<-subset(data2, HD_YEAR>2018 & HD_YEAR<2022) #keep only the three best years of data
+unique(data2$VALID_NEST) #what's left
+unique(data2$HD_YEAR)
+#unique(data2$LAT)
+```
+
+## Get rid of columns I don't need to make "data3"
+- keep 7 columns in an object called "data3"
+- show what's left using "head" and "str"
+- Hatch date is not recognized as dates here, it's "chr" data still.
+```{r subset}
+data3 <- subset(data2, select = c(NEST_NUMBER,TERRITORY,VALID_NEST,LAT,LONG,HATCH_DATE, HD_YEAR))
+
+head(data3)#what's left
+```
+```{r}
+str(data3)
+```
+
+## Convert date from character class to r date format
+- then check with "sapply"
+<<<<<<< HEAD
+- one date is still not parsing (I thought getting rid of invalid nests would solve that, but I guess not)
+- write data3 to a file on my hard drive for troubleshooting purposes.
+=======
+- one date is still not parsing (I though getting rid of invalid nests would solve that, but I guess not)
+- write data3 to a file on my hard drive
+>>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
+
+
+```{r}
+library(lubridate)
+data3$HATCH_DATE <- lubridate::dmy(data3$HATCH_DATE) #convert date
+sapply(data3, class) #check classes to make sure date was reformatted
+write.csv(data3, "data3.csv", row.names = FALSE)
+```
+
+
+<<<<<<< HEAD
+## [See below - this chunk not needed and commented out] To calculate distances between points I am going to install the package "sp" and use the function spDistsN1().
+- description: The function returns a vector of distances between a matrix of 2D points, first column longitude, second column latitude, and a single 2D point, using Euclidean or Great Circle distance (WGS84 ellipsoid) methods.
+- wait maybe there's a better way, see below for a more complete solution (I'm commenting out the "sp" stuff for now)
+
+
+```{r}
+#install.packages("sp")
+#library("sp")
+```
+## Another source suggests using packages sp and rgeos so I will load rgeos, too. Or maybe sf is the best way.  I'll try sf first.
+- link to post: https://stackoverflow.com/questions/21977720/r-finding-closest-neighboring-point-and-number-of-neighbors-within-a-given-rad
+- The documentation on rgeos says "Please note that rgeos will be retired by the end of 2023,plan transition to sf functions using GEOS at your earliest convenience." So I will load sf and comment out the rgeos installation.  I guess I'll try to implement the solution using sf even though I don't understand a lot of the basics of the reprex.  For now the "install.packages("sf") is commented out because I was already playing with it.
+```{r}
+#install.packages("rgeos")
+#library(rgeos)
+#install.packages("sf")
+library(sf)
+```
+## Load the data in data3 into data4, a "sf object" 
+- "sf", for "simple features", is a format for containing both geographic information and attributes in the same file. It's a special data frame where geographic information is in a special column, and datum is specified as well.
+- it seems to work!
+
+
+```{r}
+data4 <- st_as_sf(data3, coords = c("LAT", "LONG"), 
+crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+```
+
+## Calculate distance matrix into a file called "dist.mat"
+- I am copying code from the link but I don't fully understand it. 
+- my tentative understanding of this is that the "dist.mat" data frame is a matrix of values, separate from data.4. Each row in dist.mat contains the distances relative to the nest in the corresponding row in data4. I might be wrong.
+
+```{r}
+dist.mat <- st_distance(data4)
+```
+## This next bit calculates how many nests are within 1500m of each focal nest. I don't need it, but when I edit it out the code doesn't run later so until I figure why I'm keeping it in as only a slight nuisance. [actually it turned out to be of some interest later]
+
+```{r}
+num.1500 <- apply(dist.mat, 1, function(x) {
+  sum(x < 1500) - 1
+})
+```
+
+## Calculate nearest distance into "nn.dist"
+
+- "apply" is a useful programming command.  I don't fully understand the "function(x)" argument, but in essence, the apply command says "take each row of the distance matrix and do the following". 
+
+- "the following" in this case means find the closest nest by sorting to find the second smallest value. The sort, partial=2 is because the shortest distance from the focal nest is to itself, so the second shortest distance is to the nearest neighbor nest.
+
+- I have not yet instituted the "choose a nest from a different territory" or "choose a contemporary" nest criteria, so right now this will probably identify as the nearest nest a previous or subsequent nest by the same pair as the focal nest.  [narrator: it usually did, but not always]
+
+```{r}
+nn.dist <- apply(dist.mat, 1, function(x) {
+  return(sort(x, partial = 2)[2])})
+```
+
+## get index for nearest distance
+- this is where we identify the nearest nest. The index should allow us to cross-reference with data.4 and extract the name and location of that nest (or any other characteristic in data.4, like hatch date or hatch year)
+
+```{r}
+nn.index <- apply(dist.mat, 1, function(x) { order(x, decreasing=F)[2] })
+```
+
+## Here's where the code compiles the newly calculated nearest neighbor nest data with the original data that's still in "data3", using an intermediate file called "n.data" and eventually creating "data5," which has the neighbor data for each nest.
+
+```{r}
+n.data <- data3
+colnames(n.data)[1] <- "neighbor"
+colnames(n.data)[2:ncol(n.data)] <- 
+  paste0("n.", colnames(n.data)[2:ncol(n.data)])
+data5 <- data.frame(data3,
+                      n.data[nn.index, ],
+                      n.distance = nn.dist,
+                      radius1500 = num.1500)
+rownames(data5) <- seq(nrow(data5))
+```
+
+## Now I'm going to write the output to a csv file on my hard drive so I can look at it.
+- it works!
+- as anticipated, the actual results are not what we want because I didn't yet set the criteria for what qualifies as a closest nest. 151 times the closest nest was a nest of the same pair, 36 times it wasn't.
+- It was still instructive. Tidbits:
+-- many nests have 80+ other nests within 1500m (over the 5 years)
+-- reused nest sites are easily spotted, including (potentially; needs checking) one that I hadn't put in the compilation in the Events/Anecdotes tab, from 2018.
+-- if you sort by distance, it highlights errors in the database (one longitude entered as 78. instead of -78, etc.)
+-- overall a good first step.
+```{r}
+write.csv(data5, "data5.csv", row.names = FALSE)
+```
+
+## I'm pasting code that is incomplete. I will need to edit it.  See the readme for the source, the second stackoverflow post.  I'm just parking it here so I can play with it.  
+- the first chunk defines two functions
+- the second chunk computes the data for the new columns and fills them.
+- but it all depends on the rgeos solution, not the "sf" solution I used above.
+- and they are looking within groups, not *outside* of groups.
+- I'm going to comment it all out and think about it.
+
+```{r}
+#library(sp)
+#library(rgeos)
+
+#nearest.neighbor <- function(lon,lat) {
+  df <- data.frame(lon,lat)
+  coordinates(df) <- ~lon+lat
+  d <- gDistance(df, byid=TRUE)
+  # remove the self distance from being considered and use which.min to find the nearest neighbor
+  d[cbind(1:nrow(d),1:nrow(d))] <- NA
+  min.d <- rbind(apply(d,1,function(x) {ind <- which.min(x); list(ind=ind,distance=x[ind])}))
+}
+
+order.by.ind <- function (x,ind) x[ind]
+```
+
+
+```{r}
+result <- ncbaby %>% group_by(areaname) %>%
+                     mutate(min.d=nearest.neighbor(longitude, latitude)) %>%
+                     mutate_each(vars=c(id, printid, latitude, longitude),
+                                 funs(order.by.ind, "order.by.ind", order.by.ind(.,ind=unlist(min.d)[c(TRUE,FALSE)]))) %>%
+                     mutate(distance=unlist(min.d)[c(FALSE,TRUE)]) %>%
+                     mutate(.Areaname=areaname) %>%
+                     select(-min.d)
+
+newvars <- c('n.ID', 'n.printid', 'n.latitude', 'n.longitude', 'distance', '.Areaname')
+colnames(result) <- c(colnames(ncbaby), newvars)
+```
+=======
+## To calculate distances between points I am going to install the package "sp" and use the function spDistsN1().
+- description: The function returns a vector of distances between a matrix of 2D points, first column longitude, second column latitude, and a single 2D point, using Euclidean or Great Circle distance (WGS84 ellipsoid) methods.
+- wait maybe there's a better way, see below for a more complete solution (I'm commenting out the "sp" stuff for now)
+>>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
+
+
+```{r}
+#install.packages("sp")
+#library("sp")
+```
+## Another source suggests using packages sp and rgeos so I will load rgeos, too. Or maybe sf is the best way.  I'll try sf first.
+- link to post: https://stackoverflow.com/questions/21977720/r-finding-closest-neighboring-point-and-number-of-neighbors-within-a-given-rad
+- The documentation on rgeos says "Please note that rgeos will be retired by the end of 2023,
+plan transition to sf functions using GEOS at your earliest convenience." So I will load sf.  I guess I'll try to implement the solution using sf even though I don't understand a lot of the basics of the reprex.  For now the "install.packages("sf") is commented out because I was already playing with it.
+```{r}
+#install.packages("rgeos")
+#library(rgeos)
+#install.packages("sf")
+library(sf)
+```
+## Load the data in data3 into data4, a "sf object" 
+- "sf", for "simple features", is a format for containing both geographic information and attributes in the same file. It's a special data frame where geographic information is in a special column, and datum is specified as well.
+
+
+```{r}
+data4 <- st_as_sf(data3, coords = c("LAT", "LONG"), 
+crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+```
