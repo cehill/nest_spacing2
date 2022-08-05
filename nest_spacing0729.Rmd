@@ -107,12 +107,14 @@ crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 ```{r}
 dist.mat <- st_distance(data4)
 ```
+
 ## This next bit calculates how many nests are within 1500m of each focal nest. I don't need it, but when I edit it out the code doesn't run later so until I figure why I'm keeping it in as only a slight nuisance. [actually it turned out to be of some interest later]
+- 5 August I'm going to try commenting it out and removing it from the output, too...
 
 ```{r}
-num.1500 <- apply(dist.mat, 1, function(x) {
-  sum(x < 1500) - 1
-})
+#num.1500 <- apply(dist.mat, 1, function(x) {
+#  sum(x < 1500) - 1
+#})
 ```
 
 ## Calculate nearest distance into "nn.dist"
@@ -136,6 +138,7 @@ nn.index <- apply(dist.mat, 1, function(x) { order(x, decreasing=F)[2] })
 ```
 
 ## Here's where the code creates a new file, data5, from data3 and by calling the functions nn.dist and num.1500 defined just above. This bit pastes the newly calculated nearest neighbor nest data with the original data that's still in "data3", using an intermediate file called "n.data" and eventually creating "data5," which has the neighbor data for each nest.
+- I commented out the part that calculates #nests within 1500m, above and here.  I'm living dangerously.  
 
 ```{r}
 n.data <- data3
@@ -144,8 +147,8 @@ colnames(n.data)[2:ncol(n.data)] <-
   paste0("n.", colnames(n.data)[2:ncol(n.data)])
 data5 <- data.frame(data3,
                       n.data[nn.index, ],
-                      n.distance = nn.dist,
-                      radius1500 = num.1500)
+                      n.distance = nn.dist)
+                      #radius1500 = num.1500)
 rownames(data5) <- seq(nrow(data5))
 ```
 

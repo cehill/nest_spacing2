@@ -634,9 +634,13 @@ then 1 to 3, etc.</li>
 focal nest. I don’t need it, but when I edit it out the code doesn’t run
 later so until I figure why I’m keeping it in as only a slight nuisance.
 [actually it turned out to be of some interest later]</h2>
-<pre class="r"><code>num.1500 &lt;- apply(dist.mat, 1, function(x) {
-  sum(x &lt; 1500) - 1
-})</code></pre>
+<ul>
+<li>5 August I’m going to try commenting it out and removing it from the
+output, too…</li>
+</ul>
+<pre class="r"><code>#num.1500 &lt;- apply(dist.mat, 1, function(x) {
+#  sum(x &lt; 1500) - 1
+#})</code></pre>
 </div>
 <div id="calculate-nearest-distance-into-nn.dist" class="section level2">
 <h2>Calculate nearest distance into “nn.dist”</h2>
@@ -674,14 +678,18 @@ pastes the newly calculated nearest neighbor nest data with the original
 data that’s still in “data3”, using an intermediate file called “n.data”
 and eventually creating “data5,” which has the neighbor data for each
 nest.</h2>
+<ul>
+<li>I commented out the part that calculates #nests within 1500m, above
+and here. I’m living dangerously.</li>
+</ul>
 <pre class="r"><code>n.data &lt;- data3
 colnames(n.data)[1] &lt;- &quot;neighbor&quot;
 colnames(n.data)[2:ncol(n.data)] &lt;- 
   paste0(&quot;n.&quot;, colnames(n.data)[2:ncol(n.data)])
 data5 &lt;- data.frame(data3,
                       n.data[nn.index, ],
-                      n.distance = nn.dist,
-                      radius1500 = num.1500)
+                      n.distance = nn.dist)
+                      #radius1500 = num.1500)
 rownames(data5) &lt;- seq(nrow(data5))</code></pre>
 </div>
 <div id="now-im-going-to-write-the-output-to-a-csv-file-on-my-hard-drive-so-i-can-look-at-it." class="section level2">
