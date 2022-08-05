@@ -15,11 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - since nest card data is a big sprawling data file the resulting object in r is kind of a mess, see below.
 
 ```{r read}
-<<<<<<< HEAD
-data<-read.csv("nest_card_data20220731.csv")
-=======
 data<-read.csv("nest_card_data20220729.csv")
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
 str(data)
 ```
 
@@ -31,21 +27,17 @@ data <- dplyr::rename(data, TERRITORY = NESTING_TERRITORY)
 ```
 
 ## Going to change "HD_YEAR" from character to integer so I can filter better.
-- commented out for troubleshooting
-
-<<<<<<< HEAD
+- commented out. Filtering works OK with HD_YEAR as character data
 ```{r}
 #as.integer(data$HD_YEAR)
 ```
 
-=======
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
 ## Filter data into "data2"
 - keep only the valid nests and put them in "data2"
 - confirm that only nests with "TRUE" are left (*yes, it worked*)
 - I could also subset to just certain years at this point (keep 2019-2021)
 ```{r}
-  data2<-subset(data, VALID_NEST==TRUE) #remove all but type 2 visits
+  data2<-subset(data, VALID_NEST==TRUE)
   data2<-subset(data2, HD_YEAR>2018 & HD_YEAR<2022) #keep only the three best years of data
 unique(data2$VALID_NEST) #what's left
 unique(data2$HD_YEAR)
@@ -67,13 +59,10 @@ str(data3)
 
 ## Convert date from character class to r date format
 - then check with "sapply"
-<<<<<<< HEAD
 - one date is still not parsing (I thought getting rid of invalid nests would solve that, but I guess not)
 - write data3 to a file on my hard drive for troubleshooting purposes.
-=======
 - one date is still not parsing (I though getting rid of invalid nests would solve that, but I guess not)
 - write data3 to a file on my hard drive
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
 
 
 ```{r}
@@ -84,7 +73,6 @@ write.csv(data3, "data3.csv", row.names = FALSE)
 ```
 
 
-<<<<<<< HEAD
 ## [See below - this chunk not needed and commented out] To calculate distances between points I am going to install the package "sp" and use the function spDistsN1().
 - description: The function returns a vector of distances between a matrix of 2D points, first column longitude, second column latitude, and a single 2D point, using Euclidean or Great Circle distance (WGS84 ellipsoid) methods.
 - wait maybe there's a better way, see below for a more complete solution (I'm commenting out the "sp" stuff for now)
@@ -96,7 +84,7 @@ write.csv(data3, "data3.csv", row.names = FALSE)
 ```
 ## Another source suggests using packages sp and rgeos so I will load rgeos, too. Or maybe sf is the best way.  I'll try sf first.
 - link to post: https://stackoverflow.com/questions/21977720/r-finding-closest-neighboring-point-and-number-of-neighbors-within-a-given-rad
-- The documentation on rgeos says "Please note that rgeos will be retired by the end of 2023,plan transition to sf functions using GEOS at your earliest convenience." So I will load sf and comment out the rgeos installation.  I guess I'll try to implement the solution using sf even though I don't understand a lot of the basics of the reprex.  For now the "install.packages("sf") is commented out because I was already playing with it.
+- The documentation on rgeos says "Please note that rgeos will be retired by the end of 2023,plan transition to sf functions using GEOS at your earliest convenience." So I will load sf and comment out the rgeos installation.  I guess I'll try to implement the solution using sf even though I don't understand a lot of the basics of the reprex.  For now the "install.packages("sf") is commented out because I was already playing with it and don't need to install it.
 ```{r}
 #install.packages("rgeos")
 #library(rgeos)
@@ -114,8 +102,7 @@ crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 ```
 
 ## Calculate distance matrix into a file called "dist.mat"
-- I am copying code from the link but I don't fully understand it. 
-- my tentative understanding of this is that the "dist.mat" data frame is a matrix of values, separate from data.4. Each row in dist.mat contains the distances relative to the nest in the corresponding row in data4. I might be wrong.
+- my tentative understanding of this is that the "dist.mat" data frame is a matrix of values, separate from data.4. Each row in dist.mat contains the distances relative to the nest in the corresponding row in data4. So for the nest in the first line of data.4, nest 1, dist.mat file has a series of distances, nest 1 to nest 1, then nest 1 to nest 2, then 1 to 3, etc.
 
 ```{r}
 dist.mat <- st_distance(data4)
@@ -148,7 +135,7 @@ nn.dist <- apply(dist.mat, 1, function(x) {
 nn.index <- apply(dist.mat, 1, function(x) { order(x, decreasing=F)[2] })
 ```
 
-## Here's where the code compiles the newly calculated nearest neighbor nest data with the original data that's still in "data3", using an intermediate file called "n.data" and eventually creating "data5," which has the neighbor data for each nest.
+## Here's where the code creates a new file, data5, from data3 and by calling the functions nn.dist and num.1500 defined just above. This bit pastes the newly calculated nearest neighbor nest data with the original data that's still in "data3", using an intermediate file called "n.data" and eventually creating "data5," which has the neighbor data for each nest.
 
 ```{r}
 n.data <- data3
@@ -186,56 +173,27 @@ write.csv(data5, "data5.csv", row.names = FALSE)
 #library(rgeos)
 
 #nearest.neighbor <- function(lon,lat) {
-  df <- data.frame(lon,lat)
-  coordinates(df) <- ~lon+lat
-  d <- gDistance(df, byid=TRUE)
+  #df <- data.frame(lon,lat)
+  #coordinates(df) <- ~lon+lat
+  #d <- gDistance(df, byid=TRUE)
   # remove the self distance from being considered and use which.min to find the nearest neighbor
-  d[cbind(1:nrow(d),1:nrow(d))] <- NA
-  min.d <- rbind(apply(d,1,function(x) {ind <- which.min(x); list(ind=ind,distance=x[ind])}))
-}
+  #d[cbind(1:nrow(d),1:nrow(d))] <- NA
+  #min.d <- rbind(apply(d,1,function(x) {ind <- which.min(x); list(ind=ind,distance=x[ind])}))
+#}
 
-order.by.ind <- function (x,ind) x[ind]
+#order.by.ind <- function (x,ind) x[ind]
 ```
 
 
 ```{r}
-result <- ncbaby %>% group_by(areaname) %>%
-                     mutate(min.d=nearest.neighbor(longitude, latitude)) %>%
-                     mutate_each(vars=c(id, printid, latitude, longitude),
-                                 funs(order.by.ind, "order.by.ind", order.by.ind(.,ind=unlist(min.d)[c(TRUE,FALSE)]))) %>%
-                     mutate(distance=unlist(min.d)[c(FALSE,TRUE)]) %>%
-                     mutate(.Areaname=areaname) %>%
-                     select(-min.d)
+#result <- ncbaby %>% group_by(areaname) %>%
+                     #mutate(min.d=nearest.neighbor(longitude, latitude)) %>%
+                     #mutate_each(vars=c(id, printid, latitude, longitude),
+                                 #funs(order.by.ind, "order.by.ind", order.by.ind(.,ind=unlist(min.d)[c(TRUE,FALSE)]))) %>%
+                     #mutate(distance=unlist(min.d)[c(FALSE,TRUE)]) %>%
+                     #mutate(.Areaname=areaname) %>%
+                     #select(-min.d)
 
-newvars <- c('n.ID', 'n.printid', 'n.latitude', 'n.longitude', 'distance', '.Areaname')
-colnames(result) <- c(colnames(ncbaby), newvars)
-```
-=======
-## To calculate distances between points I am going to install the package "sp" and use the function spDistsN1().
-- description: The function returns a vector of distances between a matrix of 2D points, first column longitude, second column latitude, and a single 2D point, using Euclidean or Great Circle distance (WGS84 ellipsoid) methods.
-- wait maybe there's a better way, see below for a more complete solution (I'm commenting out the "sp" stuff for now)
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
-
-
-```{r}
-#install.packages("sp")
-#library("sp")
-```
-## Another source suggests using packages sp and rgeos so I will load rgeos, too. Or maybe sf is the best way.  I'll try sf first.
-- link to post: https://stackoverflow.com/questions/21977720/r-finding-closest-neighboring-point-and-number-of-neighbors-within-a-given-rad
-- The documentation on rgeos says "Please note that rgeos will be retired by the end of 2023,
-plan transition to sf functions using GEOS at your earliest convenience." So I will load sf.  I guess I'll try to implement the solution using sf even though I don't understand a lot of the basics of the reprex.  For now the "install.packages("sf") is commented out because I was already playing with it.
-```{r}
-#install.packages("rgeos")
-#library(rgeos)
-#install.packages("sf")
-library(sf)
-```
-## Load the data in data3 into data4, a "sf object" 
-- "sf", for "simple features", is a format for containing both geographic information and attributes in the same file. It's a special data frame where geographic information is in a special column, and datum is specified as well.
-
-
-```{r}
-data4 <- st_as_sf(data3, coords = c("LAT", "LONG"), 
-crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+#newvars <- c('n.ID', 'n.printid', 'n.latitude', 'n.longitude', 'distance', '.Areaname')
+#colnames(result) <- c(colnames(ncbaby), newvars)
 ```

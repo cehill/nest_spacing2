@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chris Hill" />
 
-<meta name="date" content="2022-07-31" />
+<meta name="date" content="2022-08-05" />
 
 <title>nest_spacing</title>
 
@@ -361,7 +361,7 @@ pre code {
 
 <h1 class="title toc-ignore">nest_spacing</h1>
 <h4 class="author">Chris Hill</h4>
-<h4 class="date">2022-07-31</h4>
+<h4 class="date">2022-08-05</h4>
 
 </div>
 
@@ -383,7 +383,7 @@ str(data)</code></pre>
 ##  $ NEST_NUMBER          : chr  &quot;LOSH-2018-01&quot; &quot;LOSH-2018-02&quot; &quot;LOSH-2018-03&quot; &quot;LOSH-2018-04&quot; ...
 ##  $ NESTING_TERRITORY    : chr  &quot;COURTH&quot; &quot;CYPRES&quot; &quot;RIVERF&quot; &quot;DISCGO&quot; ...
 ##  $ FINDER               : chr  &quot;KMM&quot; &quot;461L&quot; &quot;CEH&quot; &quot;CEH&quot; ...
-##  $ VALID_NEST           : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...
+##  $ VALID_NEST           : chr  &quot;TRUE&quot; &quot;TRUE&quot; &quot;TRUE&quot; &quot;TRUE&quot; ...
 ##  $ FOUND_DATE           : chr  &quot;5-Apr-18&quot; &quot;5-Apr-18&quot; &quot;5-Apr-18&quot; &quot;7-Apr-18&quot; ...
 ##  $ FOUND_STAGE          : chr  &quot;laying&quot; &quot;incubating&quot; &quot;incubating&quot; &quot;nestlings&quot; ...
 ##  $ FD_YEAR              : chr  &quot;2018&quot; &quot;2018&quot; &quot;2018&quot; &quot;2018&quot; ...
@@ -491,36 +491,31 @@ str(data)</code></pre>
 ##     intersect, setdiff, setequal, union</code></pre>
 <pre class="r"><code>data &lt;- dplyr::rename(data, TERRITORY = NESTING_TERRITORY)</code></pre>
 </div>
-<<<<<<< HEAD
 <div id="going-to-change-hd_year-from-character-to-integer-so-i-can-filter-better." class="section level2">
 <h2>Going to change “HD_YEAR” from character to integer so I can filter
 better.</h2>
 <ul>
-<li>commented out for troubleshooting</li>
+<li>commented out. Filtering works OK with HD_YEAR as character
+data</li>
 </ul>
 <pre class="r"><code>#as.integer(data$HD_YEAR)</code></pre>
 </div>
-=======
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
 <div id="filter-data-into-data2" class="section level2">
 <h2>Filter data into “data2”</h2>
 <ul>
 <li>keep only the valid nests and put them in “data2”</li>
 <li>confirm that only nests with “TRUE” are left (<em>yes, it
 worked</em>)</li>
-<li>I could also subset to just certain years at this point (commented
-out for troubleshooting)</li>
+<li>I could also subset to just certain years at this point (keep
+2019-2021)</li>
 </ul>
-<pre class="r"><code>  data2&lt;-subset(data, VALID_NEST==TRUE) #remove all but type 2 visits
-  #data2&lt;-subset(data2, HD_YEAR&gt;2018 &amp; HD_YEAR&lt;2022) #keep only the three best years of data
+<pre class="r"><code>  data2&lt;-subset(data, VALID_NEST==TRUE)
+  data2&lt;-subset(data2, HD_YEAR&gt;2018 &amp; HD_YEAR&lt;2022) #keep only the three best years of data
 unique(data2$VALID_NEST) #what&#39;s left</code></pre>
-<<<<<<< HEAD
 <pre><code>## [1] &quot;TRUE&quot;</code></pre>
-<pre class="r"><code>#unique(data2$HD_YEAR)
-#unique(data2$LAT)</code></pre>
-=======
-<pre><code>## [1] TRUE</code></pre>
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
+<pre class="r"><code>unique(data2$HD_YEAR)</code></pre>
+<pre><code>## [1] &quot;2019&quot; &quot;2020&quot; &quot;2021&quot;</code></pre>
+<pre class="r"><code>#unique(data2$LAT)</code></pre>
 </div>
 <div id="get-rid-of-columns-i-dont-need-to-make-data3" class="section level2">
 <h2>Get rid of columns I don’t need to make “data3”</h2>
@@ -533,41 +528,34 @@ still.</li>
 <pre class="r"><code>data3 &lt;- subset(data2, select = c(NEST_NUMBER,TERRITORY,VALID_NEST,LAT,LONG,HATCH_DATE, HD_YEAR))
 
 head(data3)#what&#39;s left</code></pre>
-<pre><code>##    NEST_NUMBER TERRITORY VALID_NEST       LAT       LONG HATCH_DATE HD_YEAR
-## 1 LOSH-2018-01    COURTH       TRUE 33.830689 -79.047979  14-Apr-18    2018
-## 2 LOSH-2018-02    CYPRES       TRUE 33.831623 -79.045607  12-Apr-18    2018
-## 3 LOSH-2018-03    RIVERF       TRUE 33.830476 -79.045899   7-Apr-18    2018
-## 4 LOSH-2018-04    DISCGO       TRUE 33.797461 -79.003753  23-Mar-18    2018
-## 5 LOSH-2018-05    HGTCCC       TRUE 33.793708 -79.001623  26-Apr-18    2018
-## 6 LOSH-2018-06    501WAL       TRUE 33.778008 -78.987116  21-Apr-18    2018</code></pre>
+<pre><code>##     NEST_NUMBER TERRITORY VALID_NEST     LAT     LONG HATCH_DATE HD_YEAR
+## 23 LOSH-2019-01    RIVERF       TRUE 33.8313 -79.0466  26-Mar-19    2019
+## 24 LOSH-2019-02    DISCGO       TRUE 33.7975 -79.0038   3-Apr-19    2019
+## 25 LOSH-2019-03    SCHOLA       TRUE 33.7963 -79.0057   6-Apr-19    2019
+## 26 LOSH-2019-04    COXFER       TRUE 33.8071 -79.0085  17-Apr-19    2019
+## 27 LOSH-2019-05    LOWESP       TRUE 33.7924 -78.9978   1-Apr-19    2019
+## 28 LOSH-2019-06    SEACOA       TRUE 33.8075 -79.0132   4-Apr-19    2019</code></pre>
 <pre class="r"><code>str(data3)</code></pre>
-<<<<<<< HEAD
-<pre><code>## &#39;data.frame&#39;:    187 obs. of  7 variables:
-=======
-<pre><code>## &#39;data.frame&#39;:    194 obs. of  7 variables:
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
-##  $ NEST_NUMBER: chr  &quot;LOSH-2018-01&quot; &quot;LOSH-2018-02&quot; &quot;LOSH-2018-03&quot; &quot;LOSH-2018-04&quot; ...
-##  $ TERRITORY  : chr  &quot;COURTH&quot; &quot;CYPRES&quot; &quot;RIVERF&quot; &quot;DISCGO&quot; ...
-##  $ VALID_NEST : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...
-##  $ LAT        : chr  &quot;33.830689&quot; &quot;33.831623&quot; &quot;33.830476&quot; &quot;33.797461&quot; ...
-##  $ LONG       : chr  &quot;-79.047979&quot; &quot;-79.045607&quot; &quot;-79.045899&quot; &quot;-79.003753&quot; ...
-##  $ HATCH_DATE : chr  &quot;14-Apr-18&quot; &quot;12-Apr-18&quot; &quot;7-Apr-18&quot; &quot;23-Mar-18&quot; ...
-##  $ HD_YEAR    : chr  &quot;2018&quot; &quot;2018&quot; &quot;2018&quot; &quot;2018&quot; ...</code></pre>
+<pre><code>## &#39;data.frame&#39;:    144 obs. of  7 variables:
+##  $ NEST_NUMBER: chr  &quot;LOSH-2019-01&quot; &quot;LOSH-2019-02&quot; &quot;LOSH-2019-03&quot; &quot;LOSH-2019-04&quot; ...
+##  $ TERRITORY  : chr  &quot;RIVERF&quot; &quot;DISCGO&quot; &quot;SCHOLA&quot; &quot;COXFER&quot; ...
+##  $ VALID_NEST : chr  &quot;TRUE&quot; &quot;TRUE&quot; &quot;TRUE&quot; &quot;TRUE&quot; ...
+##  $ LAT        : chr  &quot;33.8313&quot; &quot;33.7975&quot; &quot;33.7963&quot; &quot;33.8071&quot; ...
+##  $ LONG       : chr  &quot;-79.0466&quot; &quot;-79.0038&quot; &quot;-79.0057&quot; &quot;-79.0085&quot; ...
+##  $ HATCH_DATE : chr  &quot;26-Mar-19&quot; &quot;3-Apr-19&quot; &quot;6-Apr-19&quot; &quot;17-Apr-19&quot; ...
+##  $ HD_YEAR    : chr  &quot;2019&quot; &quot;2019&quot; &quot;2019&quot; &quot;2019&quot; ...</code></pre>
 </div>
 <div id="convert-date-from-character-class-to-r-date-format" class="section level2">
 <h2>Convert date from character class to r date format</h2>
 <ul>
 <li>then check with “sapply”</li>
-<<<<<<< HEAD
 <li>one date is still not parsing (I thought getting rid of invalid
 nests would solve that, but I guess not)</li>
 <li>write data3 to a file on my hard drive for troubleshooting
 purposes.</li>
-=======
 <li>one date is still not parsing (I though getting rid of invalid nests
 would solve that, but I guess not)</li>
 <li>write data3 to a file on my hard drive</li>
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
 </ul>
 <pre class="r"><code>library(lubridate)</code></pre>
 <pre><code>## 
@@ -578,21 +566,15 @@ would solve that, but I guess not)</li>
 <pre class="r"><code>data3$HATCH_DATE &lt;- lubridate::dmy(data3$HATCH_DATE) #convert date
 sapply(data3, class) #check classes to make sure date was reformatted</code></pre>
 <pre><code>## NEST_NUMBER   TERRITORY  VALID_NEST         LAT        LONG  HATCH_DATE 
-## &quot;character&quot; &quot;character&quot;   &quot;logical&quot; &quot;character&quot; &quot;character&quot;      &quot;Date&quot; 
+## &quot;character&quot; &quot;character&quot; &quot;character&quot; &quot;character&quot; &quot;character&quot;      &quot;Date&quot; 
 ##     HD_YEAR 
 ## &quot;character&quot;</code></pre>
 <pre class="r"><code>write.csv(data3, &quot;data3.csv&quot;, row.names = FALSE)</code></pre>
 </div>
-<<<<<<< HEAD
 <div id="see-below---this-chunk-not-needed-and-commented-out-to-calculate-distances-between-points-i-am-going-to-install-the-package-sp-and-use-the-function-spdistsn1." class="section level2">
 <h2>[See below - this chunk not needed and commented out] To calculate
 distances between points I am going to install the package “sp” and use
 the function spDistsN1().</h2>
-=======
-<div id="to-calculate-distances-between-points-i-am-going-to-install-the-package-sp-and-use-the-function-spdistsn1." class="section level2">
-<h2>To calculate distances between points I am going to install the
-package “sp” and use the function spDistsN1().</h2>
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
 <ul>
 <li>description: The function returns a vector of distances between a
 matrix of 2D points, first column longitude, second column latitude, and
@@ -610,20 +592,12 @@ rgeos, too. Or maybe sf is the best way. I’ll try sf first.</h2>
 <ul>
 <li>link to post: <a href="https://stackoverflow.com/questions/21977720/r-finding-closest-neighboring-point-and-number-of-neighbors-within-a-given-rad" class="uri">https://stackoverflow.com/questions/21977720/r-finding-closest-neighboring-point-and-number-of-neighbors-within-a-given-rad</a></li>
 <li>The documentation on rgeos says “Please note that rgeos will be
-<<<<<<< HEAD
 retired by the end of 2023,plan transition to sf functions using GEOS at
 your earliest convenience.” So I will load sf and comment out the rgeos
 installation. I guess I’ll try to implement the solution using sf even
 though I don’t understand a lot of the basics of the reprex. For now the
 “install.packages(”sf”) is commented out because I was already playing
-with it.</li>
-=======
-retired by the end of 2023, plan transition to sf functions using GEOS
-at your earliest convenience.” So I will load sf. I guess I’ll try to
-implement the solution using sf even though I don’t understand a lot of
-the basics of the reprex. For now the “install.packages(”sf”) is
-commented out because I was already playing with it.</li>
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
+with it and don’t need to install it.</li>
 </ul>
 <pre class="r"><code>#install.packages(&quot;rgeos&quot;)
 #library(rgeos)
@@ -638,7 +612,6 @@ library(sf)</code></pre>
 geographic information and attributes in the same file. It’s a special
 data frame where geographic information is in a special column, and
 datum is specified as well.</li>
-<<<<<<< HEAD
 <li>it seems to work!</li>
 </ul>
 <pre class="r"><code>data4 &lt;- st_as_sf(data3, coords = c(&quot;LAT&quot;, &quot;LONG&quot;), 
@@ -647,12 +620,12 @@ crs = &quot;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&quot;)</code></pre>
 <div id="calculate-distance-matrix-into-a-file-called-dist.mat" class="section level2">
 <h2>Calculate distance matrix into a file called “dist.mat”</h2>
 <ul>
-<li>I am copying code from the link but I don’t fully understand
-it.</li>
 <li>my tentative understanding of this is that the “dist.mat” data frame
 is a matrix of values, separate from data.4. Each row in dist.mat
 contains the distances relative to the nest in the corresponding row in
-data4. I might be wrong.</li>
+data4. So for the nest in the first line of data.4, nest 1, dist.mat
+file has a series of distances, nest 1 to nest 1, then nest 1 to nest 2,
+then 1 to 3, etc.</li>
 </ul>
 <pre class="r"><code>dist.mat &lt;- st_distance(data4)</code></pre>
 </div>
@@ -694,11 +667,13 @@ hatch year)</li>
 </ul>
 <pre class="r"><code>nn.index &lt;- apply(dist.mat, 1, function(x) { order(x, decreasing=F)[2] })</code></pre>
 </div>
-<div id="heres-where-the-code-compiles-the-newly-calculated-nearest-neighbor-nest-data-with-the-original-data-thats-still-in-data3-using-an-intermediate-file-called-n.data-and-eventually-creating-data5-which-has-the-neighbor-data-for-each-nest." class="section level2">
-<h2>Here’s where the code compiles the newly calculated nearest neighbor
-nest data with the original data that’s still in “data3”, using an
-intermediate file called “n.data” and eventually creating “data5,” which
-has the neighbor data for each nest.</h2>
+<div id="heres-where-the-code-creates-a-new-file-data5-from-data3-and-by-calling-the-functions-nn.dist-and-num.1500-defined-just-above.-this-bit-pastes-the-newly-calculated-nearest-neighbor-nest-data-with-the-original-data-thats-still-in-data3-using-an-intermediate-file-called-n.data-and-eventually-creating-data5-which-has-the-neighbor-data-for-each-nest." class="section level2">
+<h2>Here’s where the code creates a new file, data5, from data3 and by
+calling the functions nn.dist and num.1500 defined just above. This bit
+pastes the newly calculated nearest neighbor nest data with the original
+data that’s still in “data3”, using an intermediate file called “n.data”
+and eventually creating “data5,” which has the neighbor data for each
+nest.</h2>
 <pre class="r"><code>n.data &lt;- data3
 colnames(n.data)[1] &lt;- &quot;neighbor&quot;
 colnames(n.data)[2:ncol(n.data)] &lt;- 
@@ -726,11 +701,44 @@ distance, it highlights errors in the database (one longitude entered as
 78. instead of -78, etc.) – overall a good first step.</li>
 </ul>
 <pre class="r"><code>write.csv(data5, &quot;data5.csv&quot;, row.names = FALSE)</code></pre>
-=======
+</div>
+<div id="im-pasting-code-that-is-incomplete.-i-will-need-to-edit-it.-see-the-readme-for-the-source-the-second-stackoverflow-post.-im-just-parking-it-here-so-i-can-play-with-it." class="section level2">
+<h2>I’m pasting code that is incomplete. I will need to edit it. See the
+readme for the source, the second stackoverflow post. I’m just parking
+it here so I can play with it.</h2>
+<ul>
+<li>the first chunk defines two functions</li>
+<li>the second chunk computes the data for the new columns and fills
+them.</li>
+<li>but it all depends on the rgeos solution, not the “sf” solution I
+used above.</li>
+<li>and they are looking within groups, not <em>outside</em> of
+groups.</li>
+<li>I’m going to comment it all out and think about it.</li>
 </ul>
-<pre class="r"><code>data4 &lt;- st_as_sf(data3, coords = c(&quot;LAT&quot;, &quot;LONG&quot;), 
-crs = &quot;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&quot;)</code></pre>
->>>>>>> 431a9f9124061e34cafaff6fb7065035c555d472
+<pre class="r"><code>#library(sp)
+#library(rgeos)
+
+#nearest.neighbor &lt;- function(lon,lat) {
+  #df &lt;- data.frame(lon,lat)
+  #coordinates(df) &lt;- ~lon+lat
+  #d &lt;- gDistance(df, byid=TRUE)
+  # remove the self distance from being considered and use which.min to find the nearest neighbor
+  #d[cbind(1:nrow(d),1:nrow(d))] &lt;- NA
+  #min.d &lt;- rbind(apply(d,1,function(x) {ind &lt;- which.min(x); list(ind=ind,distance=x[ind])}))
+#}
+
+#order.by.ind &lt;- function (x,ind) x[ind]</code></pre>
+<pre class="r"><code>#result &lt;- ncbaby %&gt;% group_by(areaname) %&gt;%
+                     #mutate(min.d=nearest.neighbor(longitude, latitude)) %&gt;%
+                     #mutate_each(vars=c(id, printid, latitude, longitude),
+                                 #funs(order.by.ind, &quot;order.by.ind&quot;, order.by.ind(.,ind=unlist(min.d)[c(TRUE,FALSE)]))) %&gt;%
+                     #mutate(distance=unlist(min.d)[c(FALSE,TRUE)]) %&gt;%
+                     #mutate(.Areaname=areaname) %&gt;%
+                     #select(-min.d)
+
+#newvars &lt;- c(&#39;n.ID&#39;, &#39;n.printid&#39;, &#39;n.latitude&#39;, &#39;n.longitude&#39;, &#39;distance&#39;, &#39;.Areaname&#39;)
+#colnames(result) &lt;- c(colnames(ncbaby), newvars)</code></pre>
 </div>
 
 
