@@ -137,19 +137,21 @@ nn.dist <- apply(dist.mat, 1, function(x) {
 nn.index <- apply(dist.mat, 1, function(x) { order(x, decreasing=F)[2] })
 ```
 
-## Here's where the code creates a new file, data5, from data3 and by calling the functions nn.dist and num.1500 defined just above. This bit pastes the newly calculated nearest neighbor nest data with the original data that's still in "data3", using an intermediate file called "n.data" and eventually creating "data5," which has the neighbor data for each nest.
-- I commented out the part that calculates #nests within 1500m, above and here.  I'm living dangerously.  
+## Here's where the code creates a new file, "data5" by creating an intermediate file called n.data (by copying the original data3 file and renaming the columns), populating it with nearest neighbor information, and then appending n.data to the original data from data3, and tacking on the distance between the nests in the last column.
+- This makes use of the functions nn.index, nn.dist, and num.1500 that were defined above.
+- I commented out the part that calculates #nests within 1500m, above and here.  I'm living dangerously.
+- the row names start at 23 in data3 (why do they?), and in the last step they are renumbered to start at 1
 
 ```{r}
-n.data <- data3
-colnames(n.data)[1] <- "neighbor"
+n.data <- data3 #n.data is now the same as data3
+colnames(n.data)[1] <- "neighbor" #substitute "neighbor" as the new first column name
 colnames(n.data)[2:ncol(n.data)] <- 
-  paste0("n.", colnames(n.data)[2:ncol(n.data)])
+  paste0("n.", colnames(n.data)[2:ncol(n.data)])#substitute new names starting with n. for columns 2 through the end in n.data
 data5 <- data.frame(data3,
                       n.data[nn.index, ],
                       n.distance = nn.dist)
-                      #radius1500 = num.1500)
-rownames(data5) <- seq(nrow(data5))
+                      #radius1500 = num.1500) #append data3, ndata, 
+rownames(data5) <- seq(nrow(data5))#renumber the rows in data5 so they start at 1.
 ```
 
 ## Now I'm going to write the output to a csv file on my hard drive so I can look at it.
